@@ -1,13 +1,27 @@
-var SerialPort = require('serialport').SerialPort;
+var serial = require('serialport');
+var SerialPort = serial.SerialPort;
  
-var sp = new SerialPort("/dev/ttyUSB0", { 
+var TAKEOFF = "takeoff";
+var LANDING = "landing";
+ 
+var sp = new SerialPort("/dev/ttyAMA0", { 
+	parser: serial.parsers.raw,
 	baudrate: 9600 
 });
  
-sp.on('open', function(error) {
-	console.log('connection openized : ' + error + '...');
-     sp.write('takeoff\n', function(err, results) {
+function sendCmd(cmd) {
+	sp.write(cmd, function(err, results) {
       console.log('err ' + err);
       console.log('results ' + results);
     });
-})
+}
+ 
+sp.on('open', function(error) {
+	console.log('connection openized : ' + error + '...');
+     
+	sendCmd(TAKEOFF);
+	
+	setTimeout(function(){
+		sendCmd(LANDING);
+	}, 7000);
+});
