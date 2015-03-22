@@ -1,4 +1,3 @@
-var socket = require('socket.io-client')('http://192.168.1.2:8080/');
 var serial = require('serialport');
 var SerialPort = serial.SerialPort;
  
@@ -12,10 +11,12 @@ var sp = new SerialPort("/dev/ttyAMA0", {
 
 // fonction d'envoi des commandes vers le drone
 function sendCmd(cmd) {
+	console.log("sending cmd " + cmd + " to the drone !");
 	sp.write(cmd, function(err, results) {
-      console.log('err ' + err);
-      console.log('results ' + results);
-    });
+		if(err == undefined)
+      			console.log('error : ' + err);
+      		console.log('results : ' + results);
+    	});
 }
  
 var id = null;
@@ -23,6 +24,8 @@ var id = null;
 // ouverture de la connection port serie vers le drone
 sp.on('open', function(error) {
 	console.log('drone connection openized : ' + error + '...');
+
+	var socket = require('socket.io-client')('http://ec2-52-10-14-171.us-west-2.compute.amazonaws.com/');
      
 	// ouverture de la connection socket vers le serveur
 	socket.on('connect', function(){
