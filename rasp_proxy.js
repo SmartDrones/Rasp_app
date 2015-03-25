@@ -1,8 +1,10 @@
+var sys = require('sys')
+var exec = require('child_process').exec;
+function puts(error, stdout, stderr) { sys.puts(stdout) }
+exec("stty -F /dev/ttyO3 9600", puts);
+
 var serial = require('serialport');
 var SerialPort = serial.SerialPort;
- 
-var TAKEOFF = "takeoff";
-var LANDING = "landing";
  
 var sp = new SerialPort("/dev/ttyAMA0", { 
 	//parser: serial.parsers.raw,
