@@ -5,15 +5,22 @@ var TAKEOFF = "takeoff";
 var LANDING = "landing";
  
 var sp = new SerialPort("/dev/ttyAMA0", { 
-	parser: serial.parsers.raw,
+	//parser: serial.parsers.raw,
 	baudrate: 9600 
 });
 
 // fonction d'envoi des commandes vers le drone
 function sendCmd(cmd) {
 	console.log("sending cmd " + cmd + " to the drone !");
-	sp.write(cmd, function(err, results) {
-		if(err == undefined)
+
+	var cmd_completed = "";
+
+	for(i = 0; i < 16; i++)
+		cmd_completed = cmd_completed.concat((i < cmd.length) ? cmd[i] : " ");
+	
+	console.log("cmd : " + cmd_completed);
+	sp.write(cmd_completed, function(err, results){
+		if(err != undefined)
       			console.log('error : ' + err);
       		console.log('results : ' + results);
     	});
@@ -25,8 +32,11 @@ var id = null;
 sp.on('open', function(error) {
 	console.log('drone connection openized : ' + error + '...');
 
-	var socket = require('socket.io-client')('http://ec2-52-10-14-171.us-west-2.compute.amazonaws.com/');
-     
+
+	var socket = require('socket.io-client')('http://ec2-54-149-155-204.us-west-2.compute.amazonaws.com/');
+	
+	console.log('Trying to open server connection...');    
+ 
 	// ouverture de la connection socket vers le serveur
 	socket.on('connect', function(){
 		console.log("raspberry connected to the server !");
@@ -46,10 +56,4 @@ sp.on('open', function(error) {
 			sendCmd(data.cmd);
 		}
 	});
-	 
-	/*sendCmd(TAKEOFF);
-
-	setTimeout(function(){
-		sendCmd(LANDING);
-	}, 7000);*/
 });
